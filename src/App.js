@@ -1,20 +1,31 @@
 import React, {Component} from 'react'
 import Car from './Car'
-import './App.css'
+import './App.scss'
+import withClass from './hoc/withClass'
+import Counter from "./Counter/Counter";
+import ErrorBoundary from "./ErrorBoundary/ErrorBoundary";
 
 class App extends Component {
+    constructor(props) {
+        console.log('constructor');
+        super(props);
 
-    state = {
-        cars: [
-            {name: "Ford", age: 2015},
-            {name: "Audi", age: 2011},
-            {name: "Lexus", age: 2016},
-            {name: "Mazda", age: 2018}
-        ],
-        title: "React component",
-        counter: 1,
-        showList: false
-    };
+        this.state = {
+            cars: [
+                {name: "Ford", age: 2015},
+                {name: "Audi", age: 2017},
+                {name: "Lexus", age: 2016},
+                {name: "Mazda", age: 2018},
+                {name: "Toyota", age: 2011},
+                {name: "Porsche", age: 2016},
+                {name: "Ferrari", age: 2014}
+            ],
+            title: "React component",
+            counter: 1,
+            showList: false
+        }
+    }
+
 
     deleteElement(names, index) {
         const cars = this.state.cars.concat();
@@ -66,20 +77,57 @@ class App extends Component {
         // })
     };
 
+    componentDidMount() {
+        console.log('componentDidMount')
+    }
+
+
+    shouldComponentUpdate(nextProps, nextState, nextContext) {
+        console.log('shouldComponentUpdate', nextProps, nextState, nextContext);
+        return true;
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        console.log('getDerivedStateFromProps ', nextProps, prevState);
+        return prevState
+    }
+
+
+    componentDidUpdate() {
+        console.log('componentDidUpdate')
+    }
+
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        console.log('getSnapshotBeforeUpdate');
+        return prevState
+    }
+
+    componentWillUnmount() {
+        console.log('componentWillUnmount')
+    }
+
+
     render() {
+        // if(Math.random() > 0.9){
+        //     throw new Error('Car random failed')
+        // }
+        console.log('render');
         return (
-            <div className="App">
+            <div className='App'>
                 <h1>{this.state.title}</h1>
-                <div>
+                <Counter/>
+                <React.Fragment>
                     <input type="text" onChange={this.inputChangeTitle}/>
-                    <button onClick={this.toggleCarsHandler}>Toggle cars</button>
-                </div>
+                    <button className='AppButton' onClick={this.toggleCarsHandler}>Toggle cars</button>
+                </React.Fragment>
                 <button onClick={this.changeTitleHandle.bind(this, 'Changed')}>Counter {this.state.counter}</button>
+
                 {
                     this.state.showList
                         ? this.state.cars.map((answer, index) => {
-                            return <Car
-                                    key={index}
+                            return (
+                                <ErrorBoundary key={index} ><Car
+                                    index={index}
                                     title={answer.title}
                                     name={answer.name}
                                     age={answer.age}
@@ -91,7 +139,9 @@ class App extends Component {
                                     }
                                     // onChangeTitle={this.changeTitleHandle.bind(this, answer.name)}
                                     // onChangeTitle={() =>{this.changeTitleHandle(answer.name)}}
-                                    >  {answer.age > 2016 ? <h4 color={'red'}>Hot price</h4> : ""} </Car>})
+                                >  {answer.age > 2016 ? <h4 color={'red'}>Hot price</h4> : ""} </Car>
+                                </ErrorBoundary>)
+                        })
                         :
                         null
                 }
@@ -100,4 +150,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default withClass(App, 'App');
